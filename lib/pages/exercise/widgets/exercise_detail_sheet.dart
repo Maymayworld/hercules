@@ -156,7 +156,7 @@ class ExerciseDetailSheet extends StatelessWidget {
             decoration: darkCardDecoration,
             child: Icon(
               _getExerciseIcon(),
-              color: exercise.mainBodyPart.color,
+              color: Colors.red, // 赤で統一
               size: 20.sp,
             ),
           ),

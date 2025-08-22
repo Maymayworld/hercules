@@ -163,44 +163,6 @@ class _SettingsSheetState extends ConsumerState<SettingSheet> {
               
               SizedBox(height: 24.sp),
               
-              // 一言コメント設定
-              _buildSettingSection(
-                title: '一言コメント',
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 4.sp),
-                  decoration: darkInputDecoration,
-                  child: TextField(
-                    controller: _commentController,
-                    style: GoogleFonts.inter(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                      color: darkTextPrimary,
-                    ),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '一言コメントを入力',
-                      hintStyle: TextStyle(
-                        color: darkTextSecondary,
-                      ),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    enabled: !_isSaving, // 保存中は無効化
-                    maxLength: 50, // 文字数制限
-                    buildCounter: (context, {required currentLength, required isFocused, maxLength}) {
-                      return Text(
-                        '$currentLength/${maxLength ?? 0}',
-                        style: GoogleFonts.inter(
-                          fontSize: 10.sp,
-                          color: darkTextSecondary,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              
-              SizedBox(height: 24.sp),
-              
               // データ管理設定
               _buildSettingSection(
                 title: 'データ管理',

@@ -88,21 +88,17 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
                 width: 32.sp,
                 height: 32.sp,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(8.sp),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      offset: Offset(0, 1.sp),
-                      blurRadius: 2.sp,
-                      spreadRadius: 0,
-                    ),
-                  ],
+                  border: Border.all(
+                    color: darkTextSecondary.withOpacity(0.5),
+                    width: 1.5,
+                  ),
                 ),
                 child: Icon(
                   Icons.delete_outline,
                   size: 16.sp,
-                  color: Colors.red.withOpacity(0.8),
+                  color: Colors.red,
                 ),
               ),
             ),
@@ -195,20 +191,16 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
               width: 32.sp,
               height: 32.sp,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(8.sp),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    offset: Offset(0, 1.sp),
-                    blurRadius: 2.sp,
-                    spreadRadius: 0,
-                  ),
-                ],
+                border: Border.all(
+                  color: darkTextSecondary.withOpacity(0.5),
+                  width: 1.5,
+                ),
               ),
               child: Icon(
                 Icons.delete_outline,
-                color: Colors.red.withOpacity(0.8),
+                color: Colors.red,
                 size: 18.sp,
               ),
             ),

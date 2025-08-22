@@ -11,6 +11,7 @@ import 'widgets/exercise_record_sheet.dart';
 import 'widgets/result_dialog_widget.dart';
 import '../../providers/recording_state_provider.dart';
 import '../../providers/exercise_records_provider.dart';
+import '../../providers/favorites_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ExerciseScreen extends HookConsumerWidget {
@@ -58,11 +59,13 @@ class ExerciseScreen extends HookConsumerWidget {
     final searchController = useTextEditingController();
     final selectedBodyParts = useState<Set<BodyPart>>(<BodyPart>{});
     final equipmentFilter = useState<bool?>(null); // null: 全て, true: 器具あり, false: 器具なし
+    final favoritesFilter = useState<bool>(false); // お気に入りフィルター
     final filteredExercises = useState<List<Exercise>>(sortedExercises); // ソート済みリストで初期化
     
     // 記録モードの状態を監視
     final isRecording = ref.watch(recordingStateProvider);
     final exerciseRecords = ref.watch(exerciseRecordsProvider);
+    final favorites = ref.watch(favoritesProvider);
 
     void updateFilteredExercises() {
       var filtered = ExerciseData.getFilteredExercises(
@@ -70,6 +73,12 @@ class ExerciseScreen extends HookConsumerWidget {
         selectedBodyParts: selectedBodyParts.value.isEmpty ? null : selectedBodyParts.value,
         equipmentFilter: equipmentFilter.value,
       );
+      
+      // お気に入りフィルターを適用
+      if (favoritesFilter.value) {
+        filtered = filtered.where((exercise) => favorites.contains(exercise.id)).toList();
+      }
+      
       // 変更可能なリストに変換してからソート
       var mutableFiltered = List<Exercise>.from(filtered);
       mutableFiltered.sort((a, b) => a.name.compareTo(b.name));
@@ -96,9 +105,15 @@ class ExerciseScreen extends HookConsumerWidget {
       updateFilteredExercises();
     }
 
+    void toggleFavoritesFilter() {
+      favoritesFilter.value = !favoritesFilter.value;
+      updateFilteredExercises();
+    }
+
     void clearAllFilters() {
       selectedBodyParts.value = <BodyPart>{};
       equipmentFilter.value = null;
+      favoritesFilter.value = false;
       searchController.clear();
       filteredExercises.value = sortedExercises; // ソート済みの全リストに戻す
     }
@@ -108,6 +123,12 @@ class ExerciseScreen extends HookConsumerWidget {
       searchController.addListener(listener);
       return () => searchController.removeListener(listener);
     }, [searchController]);
+
+    // お気に入りの変更を監視
+    useEffect(() {
+      updateFilteredExercises();
+      return null;
+    }, [favorites]);
 
     final theme = Theme.of(context);
     
@@ -163,7 +184,9 @@ class ExerciseScreen extends HookConsumerWidget {
                         _buildFilterChip(
                           context: context,
                           label: '全て',
-                          isSelected: selectedBodyParts.value.isEmpty && equipmentFilter.value == null,
+                          isSelected: selectedBodyParts.value.isEmpty && 
+                                     equipmentFilter.value == null && 
+                                     !favoritesFilter.value,
                           onTap: clearAllFilters,
                           isAllChip: true,
                         ),
@@ -203,6 +226,15 @@ class ExerciseScreen extends HookConsumerWidget {
                           ),
                         )),
                         
+                        // お気に入りチップ（一番右）
+                        _buildFilterChip(
+                          context: context,
+                          label: '', // テキストなし
+                          isSelected: favoritesFilter.value,
+                          onTap: toggleFavoritesFilter,
+                          isFavoritesChip: true,
+                        ),
+                        
                         SizedBox(width: 16.sp), // 右側の余白
                       ],
                     ),
@@ -223,11 +255,11 @@ class ExerciseScreen extends HookConsumerWidget {
                         ),
                       ),
                       const Spacer(),
-                      if (selectedBodyParts.value.isNotEmpty || equipmentFilter.value != null)
+                      if (selectedBodyParts.value.isNotEmpty || equipmentFilter.value != null || favoritesFilter.value)
                         Expanded(
                           flex: 3,
                           child: Text(
-                            _buildFilterStatusText(selectedBodyParts.value, equipmentFilter.value),
+                            _buildFilterStatusText(selectedBodyParts.value, equipmentFilter.value, favoritesFilter.value),
                             style: GoogleFonts.inter(
                               color: Colors.red,
                               fontSize: 14.sp,
@@ -274,8 +306,12 @@ class ExerciseScreen extends HookConsumerWidget {
     );
   }
 
-  String _buildFilterStatusText(Set<BodyPart> selectedBodyParts, bool? equipmentFilter) {
+  String _buildFilterStatusText(Set<BodyPart> selectedBodyParts, bool? equipmentFilter, bool favoritesFilter) {
     List<String> filters = [];
+    
+    if (favoritesFilter) {
+      filters.add('お気に入り');
+    }
     
     if (equipmentFilter != null) {
       filters.add(equipmentFilter ? '器具' : '自重');
@@ -347,12 +383,15 @@ Widget _buildFilterChip({
   BodyPart? bodyPart,
   bool isAllChip = false,
   bool isEquipmentChip = false,
+  bool isFavoritesChip = false,
   bool? equipmentType, // true: 器具あり, false: 器具なし
 }) {
   IconData chipIcon;
   
   if (isAllChip) {
     chipIcon = Icons.apps; // 元のままのアイコン
+  } else if (isFavoritesChip) {
+    chipIcon = Icons.favorite; // お気に入りアイコン
   } else if (isEquipmentChip) {
     chipIcon = equipmentType == true ? Icons.fitness_center : Icons.accessibility; // ダンベル・自重忍者
   } else if (bodyPart != null) {
@@ -411,20 +450,22 @@ Widget _buildFilterChip({
               ? Colors.red
               : darkTextSecondary,
           ),
-          SizedBox(width: 2.sp),
-          Expanded(
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: isSelected 
-                  ? Colors.red
-                  : darkTextSecondary,
-                fontSize: 11.sp,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+          if (label.isNotEmpty) ...[
+            SizedBox(width: 2.sp),
+            Expanded(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  color: isSelected 
+                    ? Colors.red
+                    : darkTextSecondary,
+                  fontSize: 11.sp,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     ),

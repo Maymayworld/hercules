@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 import '../data/exercise_data.dart';
 import '../../../providers/recording_state_provider.dart';
 import '../../../providers/exercise_records_provider.dart';
+import '../../../providers/favorites_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ExerciseTileWidget extends HookConsumerWidget {
@@ -42,6 +43,8 @@ class ExerciseTileWidget extends HookConsumerWidget {
     final theme = Theme.of(context);
     final isRecording = ref.watch(recordingStateProvider);
     final exerciseRecord = ref.watch(exerciseRecordsProvider)[exercise.id];
+    final favorites = ref.watch(favoritesProvider);
+    final isFavorite = favorites.contains(exercise.id);
     
     return InkWell(
       onTap: onTap,
@@ -60,16 +63,39 @@ class ExerciseTileWidget extends HookConsumerWidget {
         ),
         child: Row(
           children: [
-            // 左側：メイン部位のアイコン（ダークテーマ）
-            Container(
-              width: 40.sp,
-              height: 40.sp,
-              decoration: darkCardDecoration,
-              child: Icon(
-                _getExerciseIcon(),
-                color: exercise.mainBodyPart.color, // 部位別の色
-                size: 20.sp,
-              ),
+            // 左側：メイン部位のアイコン（ダークテーマ）+ ハートボタン
+            Stack(
+              children: [
+                Container(
+                  width: 40.sp,
+                  height: 40.sp,
+                  decoration: darkCardDecoration,
+                  child: Icon(
+                    _getExerciseIcon(),
+                    color: Colors.red, // 赤で統一
+                    size: 20.sp,
+                  ),
+                ),
+                // ハートボタン（右上角）
+                Positioned(
+                  top: -4.sp,
+                  right: -4.sp,
+                  child: GestureDetector(
+                    onTap: () {
+                      ref.read(favoritesProvider.notifier).toggleFavorite(exercise.id);
+                    },
+                    child: Container(
+                      width: 24.sp,
+                      height: 24.sp,
+                      child: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        size: 18.sp,
+                        color: isFavorite ? Colors.red : darkTextSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             
             SizedBox(width: 16.sp),

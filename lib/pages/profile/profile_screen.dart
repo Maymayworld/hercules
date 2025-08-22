@@ -6,6 +6,9 @@ import 'package:sizer/sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import '../../providers/xp_level_provider.dart';
 import '../../providers/workout_sessions_provider.dart';
 import '../../providers/persistent_xp_provider.dart';
@@ -32,7 +35,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
   late TabController _tabController;
   String _username = 'ユーザー名'; // デフォルト値
   String _comment = '今日も頑張ろう！'; // デフォルトコメント
-  String? _profileImagePath; // プロフィール画像のパス
+  String? _profileImageData; // プロフィール画像のbase64データ
   bool _isLoadingUsername = true; // ユーザー名読み込み中フラグ
   bool _isLoadingComment = true; // コメント読み込み中フラグ
   bool _isLoadingProfileImage = true; // プロフィール画像読み込み中フラグ
@@ -46,7 +49,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
   // SharedPreferencesキー
   static const String _usernameKey = 'user_profile_username';
   static const String _commentKey = 'user_profile_comment';
-  static const String _profileImageKey = 'user_profile_image_path';
+  static const String _profileImageKey = 'user_profile_image_data';
 
 
 
@@ -126,11 +129,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
   Future<void> _loadProfileImage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final savedImagePath = prefs.getString(_profileImageKey);
+      final savedImageData = prefs.getString(_profileImageKey);
       
       if (mounted) {
         setState(() {
-          _profileImagePath = savedImagePath;
+          _profileImageData = savedImageData;
           _isLoadingProfileImage = false;
         });
       }
@@ -188,23 +191,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
     }
   }
 
-  // SharedPreferencesにプロフィール画像パスを保存
-  Future<void> _saveProfileImagePath(String imagePath) async {
+  // SharedPreferencesにプロフィール画像データを保存
+  Future<void> _saveProfileImageData(String imageData) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_profileImageKey, imagePath);
+      await prefs.setString(_profileImageKey, imageData);
       
       if (mounted) {
         setState(() {
-          _profileImagePath = imagePath;
+          _profileImageData = imageData;
         });
       }
     } catch (e) {
-      print('Failed to save profile image path: $e');
+      print('Failed to save profile image data: $e');
       // エラーが発生した場合でも状態は更新する（UI応答性のため）
       if (mounted) {
         setState(() {
-          _profileImagePath = imagePath;
+          _profileImageData = imageData;
         });
       }
     }
@@ -218,9 +221,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
         allowMultiple: false,
       );
       
-      if (result != null && result.files.single.path != null) {
-        final imagePath = result.files.single.path!;
-        await _saveProfileImagePath(imagePath);
+      if (result != null && result.files.single.bytes != null) {
+        final imageBytes = result.files.single.bytes!;
+        final imageData = base64Encode(imageBytes);
+        await _saveProfileImageData(imageData);
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -291,45 +295,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
     
     return Scaffold(
       backgroundColor: darkBackground,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Text('Hercules', style: theme.textTheme.headlineMedium?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: 18.sp,
-          color: Colors.red,
-        )),
-        actions: [
-          Container(
-            margin: EdgeInsets.only(right: 16.sp, top: 8.sp),
-            width: 32.sp, // ボタン全体のサイズを明示的に指定
-            height: 32.sp, // ボタン全体のサイズを明示的に指定
-            decoration: BoxDecoration(
-              color: darkCardColor,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  offset: Offset(0, 2.sp),
-                  blurRadius: 4.sp,
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
-            child: IconButton(
-              padding: EdgeInsets.zero, // パディングを削除
-              constraints: const BoxConstraints(), // デフォルトの制約を削除
-              onPressed: () => _showSettingsModal(context),
-              icon: Icon(
-                Icons.settings,
-                color: darkTextSecondary,
-                size: 16.sp,
-              ),
-            ),
-          ),
-        ],
-      ),
       body: SafeArea(
         child: levelInfoAsync.when(
           data: (levelInfo) => _buildContent(context, levelInfo),
@@ -370,164 +335,172 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
   Widget _buildContent(BuildContext context, Map<String, LevelInfo> levelInfo) {
     final theme = Theme.of(context);
     
-    return Column(
+    return Stack(
       children: [
-        // プロフィール上部（修正版）
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.sp),
-          child: Row(
-            children: [
-              // プロフィール写真（タップで変更可能）
-              GestureDetector(
-                onTap: _pickProfileImage,
-                child: Container(
-                  width: 80.sp,
-                  height: 80.sp,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        offset: Offset(0, 4.sp),
-                        blurRadius: 8.sp,
-                        spreadRadius: 0,
+        // メインコンテンツ
+        Column(
+          children: [
+            SizedBox(height: 32.sp),
+            // プロフィール上部（修正版 - 縦並び）
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20.sp),
+              child: Column(
+                children: [
+                  // プロフィール写真（タップで変更可能）- 中央配置
+                  GestureDetector(
+                    onTap: _pickProfileImage,
+                    child: Container(
+                      width: 80.sp,
+                      height: 80.sp,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            offset: Offset(0, 4.sp),
+                            blurRadius: 8.sp,
+                            spreadRadius: 0,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: _isLoadingProfileImage
-                        ? Container(
-                            color: darkCardColor,
-                            child: Icon(
-                              Icons.person,
-                              size: 40.sp,
-                              color: darkTextSecondary,
-                            ),
-                          )
-                        : _profileImagePath != null && File(_profileImagePath!).existsSync()
-                            ? Image.file(
-                                File(_profileImagePath!),
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: darkCardColor,
-                                    child: Icon(
-                                      Icons.person,
-                                      size: 40.sp,
-                                      color: darkTextSecondary,
-                                    ),
-                                  );
-                                },
-                              )
-                            : Container(
+                      child: ClipOval(
+                        child: _isLoadingProfileImage
+                            ? Container(
                                 color: darkCardColor,
                                 child: Icon(
                                   Icons.person,
                                   size: 40.sp,
                                   color: darkTextSecondary,
                                 ),
-                              ),
+                              )
+                            : _profileImageData != null
+                                ? Image.memory(
+                                    base64Decode(_profileImageData!),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: darkCardColor,
+                                        child: Icon(
+                                          Icons.person,
+                                          size: 40.sp,
+                                          color: darkTextSecondary,
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : Container(
+                                    color: darkCardColor,
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 40.sp,
+                                      color: darkTextSecondary,
+                                    ),
+                                  ),
+                      ),
+                    ),
                   ),
-                ),
+                  
+                  SizedBox(height: 12.sp),
+                  
+                  // ユーザー名（プロフィール画像の下）- 中央配置
+                  _isLoadingUsername
+                      ? Container(
+                          height: 24.sp,
+                          width: 120.sp,
+                          decoration: BoxDecoration(
+                            color: darkCardColor,
+                            borderRadius: BorderRadius.circular(4.sp),
+                          ),
+                        )
+                      : Text(
+                          _username,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: darkTextPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.sp,
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                ],
               ),
-              
-              SizedBox(width: 20.sp),
-              
-              // 名前とコメント（プロフィール画像の右側）
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+            
+            SizedBox(height: 8.sp),
+            
+            // タブバー（アイコン版）
+            Container(
+              child: TabBar(
+                controller: _tabController,
+                labelColor: darkTextPrimary,
+                unselectedLabelColor: darkTextSecondary,
+                dividerColor: darkTextSecondary.withOpacity(0.3),
+                dividerHeight: 0.5,
+                indicatorColor: Colors.red,
+                overlayColor: WidgetStateProperty.all(Colors.transparent),
+                splashFactory: NoSplash.splashFactory,
+                tabs: [
+                  Tab(
+                    icon: Icon(
+                      Icons.trending_up,
+                      size: 20.sp,
+                    ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.history,
+                      size: 20.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // タブビュー
+            Expanded(
+              child: Container(
+                color: darkBackground,
+                child: TabBarView(
+                  controller: _tabController,
                   children: [
-                    // ユーザー名
-                    _isLoadingUsername
-                        ? Container(
-                            height: 24.sp,
-                            width: 120.sp,
-                            decoration: BoxDecoration(
-                              color: darkCardColor,
-                              borderRadius: BorderRadius.circular(4.sp),
-                            ),
-                          )
-                        : Text(
-                            _username,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: darkTextPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20.sp,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                    
-                    SizedBox(height: 8.sp),
-                    
-                    // 一言コメント
-                    _isLoadingComment
-                        ? Container(
-                            height: 16.sp,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: darkCardColor,
-                              borderRadius: BorderRadius.circular(4.sp),
-                            ),
-                          )
-                        : Text(
-                            _comment,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: darkTextSecondary,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
+                    _buildLevelTab(context, levelInfo),
+                    _buildRecordTab(context),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         
-        SizedBox(height: 20.sp),
-        
-        // タブバー（アイコン版）
-        Container(
-          child: TabBar(
-            controller: _tabController,
-            labelColor: darkTextPrimary,
-            unselectedLabelColor: darkTextSecondary,
-            dividerColor: darkTextSecondary.withOpacity(0.3),
-            dividerHeight: 0.5,
-            indicatorColor: Colors.red,
-            overlayColor: WidgetStateProperty.all(Colors.transparent),
-            splashFactory: NoSplash.splashFactory,
-            tabs: [
-              Tab(
-                icon: Icon(
-                  Icons.trending_up,
-                  size: 20.sp,
-                ),
-              ),
-              Tab(
-                icon: Icon(
-                  Icons.history,
-                  size: 20.sp,
-                ),
-              ),
-            ],
-          ),
-        ),
-        
-        // タブビュー
-        Expanded(
+        // 設定ボタン（右上に配置）
+        Positioned(
+          top: 16.sp,
+          right: 16.sp,
           child: Container(
-            color: darkBackground,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildLevelTab(context, levelInfo),
-                _buildRecordTab(context),
+            width: 40.sp,
+            height: 40.sp,
+            decoration: BoxDecoration(
+              color: darkCardColor,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  offset: Offset(0, 2.sp),
+                  blurRadius: 4.sp,
+                  spreadRadius: 0,
+                ),
               ],
+            ),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () => _showSettingsModal(context),
+              icon: Icon(
+                Icons.settings,
+                color: darkTextSecondary,
+                size: 20.sp,
+              ),
             ),
           ),
         ),

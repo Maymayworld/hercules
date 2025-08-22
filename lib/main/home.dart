@@ -61,7 +61,7 @@ class GlassBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 49,
+      height: 56,
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
