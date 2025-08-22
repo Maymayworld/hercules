@@ -478,8 +478,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
           top: 16.sp,
           right: 16.sp,
           child: Container(
-            width: 40.sp,
-            height: 40.sp,
+            width: 32.sp,
+            height: 32.sp,
             decoration: BoxDecoration(
               color: darkCardColor,
               shape: BoxShape.circle,
@@ -499,7 +499,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
               icon: Icon(
                 Icons.settings,
                 color: darkTextSecondary,
-                size: 20.sp,
+                size: 16.sp,
               ),
             ),
           ),

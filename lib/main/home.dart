@@ -33,116 +33,39 @@ class Home extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      extendBody: true,
       body: pages[currentIndex.value],
-      bottomNavigationBar: GlassBottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex.value,
         onTap: (index) => currentIndex.value = index,
-      ),
-    );
-  }
-}
-
-// ガラス効果ボトムナビゲーション
-class GlassBottomNavigationBar extends StatelessWidget {
-  final int currentIndex;
-  final Function(int) onTap;
-
-  // ダークテーマ用の色定義
-  static const Color darkCardColor = Color(0xFF2C2C2C);
-  static const Color darkTextSecondary = Color(0xFFB0B0B0);
-
-  const GlassBottomNavigationBar({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 56,
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
-      ),
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: darkCardColor.withOpacity(0.8), // ダークテーマ用の背景色
-              // border: Border(
-              //   top: BorderSide(
-              //     color: darkTextSecondary.withOpacity(0.3),
-              //     width: 0.5,
-              //   ),
-              // ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildGlassNavItem(
-                  context: context,
-                  icon: Icons.person,
-                  outlineIcon: Icons.person_outline,
-                  index: 0,
-                  isSelected: currentIndex == 0,
-                ),
-                _buildGlassNavItem(
-                  context: context,
-                  icon: Icons.fitness_center,
-                  outlineIcon: Icons.fitness_center_outlined,
-                  index: 1,
-                  isSelected: currentIndex == 1,
-                ),
-                _buildGlassNavItem(
-                  context: context,
-                  icon: Icons.assignment,
-                  outlineIcon: Icons.assignment_outlined,
-                  index: 2,
-                  isSelected: currentIndex == 2,
-                ),
-                _buildGlassNavItem(
-                  context: context,
-                  icon: Icons.newspaper,
-                  outlineIcon: Icons.newspaper_outlined,
-                  index: 3,
-                  isSelected: currentIndex == 3,
-                ),
-                _buildGlassNavItem(
-                  context: context,
-                  icon: Icons.shopping_cart,
-                  outlineIcon: Icons.shopping_cart_outlined,
-                  index: 4,
-                  isSelected: currentIndex == 4,
-                ),
-              ],
-            ),
+        backgroundColor: const Color(0xFF2C2C2C), // ダークテーマ用の背景色
+        selectedItemColor: Colors.red, // 選択されたアイテムの色
+        unselectedItemColor: const Color(0xFFB0B0B0), // 未選択アイテムの色
+        showSelectedLabels: false, // ラベルを非表示
+        showUnselectedLabels: false, // ラベルを非表示
+        elevation: 0, // 影を削除
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'プロフィール',
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGlassNavItem({
-    required BuildContext context,
-    required IconData icon,
-    required IconData outlineIcon,
-    required int index,
-    required bool isSelected,
-  }) {
-    return GestureDetector(
-      onTap: () => onTap(index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          child: Icon(
-            icon, // 常に同じアイコンを使用
-            size: 24,
-            color: isSelected ? Colors.red : darkTextSecondary, // ダークテーマ用の色
+          BottomNavigationBarItem(
+            icon: Icon(Icons.fitness_center),
+            label: '筋トレ図鑑',
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'クエスト',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.newspaper),
+            label: 'ニュース',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'ショップ',
+          ),
+        ],
       ),
     );
   }
