@@ -48,6 +48,10 @@ class GlassBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
+  // ダークテーマ用の色定義
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
+
   const GlassBottomNavigationBar({
     super.key,
     required this.currentIndex,
@@ -56,8 +60,6 @@ class GlassBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Container(
       height: 49,
       decoration: const BoxDecoration(
@@ -67,11 +69,11 @@ class GlassBottomNavigationBar extends StatelessWidget {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFFE0E5EC),
+            decoration: BoxDecoration(
+              color: darkCardColor.withOpacity(0.8), // ダークテーマ用の背景色
               // border: Border(
               //   top: BorderSide(
-              //     color: Color(0xFF2C2C2E).withOpacity(0.7),
+              //     color: darkTextSecondary.withOpacity(0.3),
               //     width: 0.5,
               //   ),
               // ),
@@ -138,7 +140,7 @@ class GlassBottomNavigationBar extends StatelessWidget {
           child: Icon(
             icon, // 常に同じアイコンを使用
             size: 24,
-            color: isSelected ? Colors.red : const Color(0xFF2C2C2E).withOpacity(0.7), // テーマの色を使用
+            color: isSelected ? Colors.red : darkTextSecondary, // ダークテーマ用の色
           ),
         ),
       ),

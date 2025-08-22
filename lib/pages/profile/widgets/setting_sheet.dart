@@ -29,10 +29,11 @@ class _SettingsSheetState extends ConsumerState<SettingSheet> {
   late TextEditingController _commentController;
   bool _isSaving = false; // 保存中フラグ
 
-  // ニューモーフィック用の色定義
-  static const Color neumorphicBackground = Color(0xFFE0E5EC);
-  static const Color neumorphicShadowDark = Color(0xFFA3B1C6);
-  static const Color neumorphicShadowLight = Color(0xFFFFFFFF);
+  // ダークテーマ用の色定義
+  static const Color darkBackground = Color(0xFF1C1C1C);
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
   // SharedPreferencesキー
   static const String _usernameKey = 'user_profile_username';
@@ -52,45 +53,29 @@ class _SettingsSheetState extends ConsumerState<SettingSheet> {
     super.dispose();
   }
 
-  // ニューモーフィックスタイル用のBoxDecoration
-  BoxDecoration get neumorphicDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // ダークテーマ用のBoxDecoration
+  BoxDecoration get darkCardDecoration => BoxDecoration(
+    color: darkCardColor,
     borderRadius: BorderRadius.circular(12.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(4.sp, 4.sp),
-        blurRadius: 8.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-4.sp, -4.sp),
+        color: Colors.black.withOpacity(0.3),
+        offset: Offset(0, 2.sp),
         blurRadius: 8.sp,
         spreadRadius: 0,
       ),
     ],
   );
 
-  // 押し込まれたニューモーフィックスタイル（内側シャドウ効果）
-BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
-  color: neumorphicBackground,
-  borderRadius: BorderRadius.circular(12.sp),
-  boxShadow: [
-    BoxShadow(
-      color: neumorphicShadowLight,
-      offset: Offset(2.sp, 2.sp),
-      blurRadius: 4.sp,
-      spreadRadius: 0,
+  // 入力フィールド用のダークテーマスタイル
+  BoxDecoration get darkInputDecoration => BoxDecoration(
+    color: darkBackground,
+    borderRadius: BorderRadius.circular(12.sp),
+    border: Border.all(
+      color: darkTextSecondary.withOpacity(0.3),
+      width: 1,
     ),
-    BoxShadow(
-      color: neumorphicShadowDark,
-      offset: Offset(-2.sp, -2.sp),
-      blurRadius: 4.sp,
-      spreadRadius: 0,
-    ),
-  ],
-);
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +84,7 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
     return Container(
       height: MediaQuery.of(context).size.height,
       decoration: const BoxDecoration(
-        color: neumorphicBackground,
+        color: darkBackground,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(0),
           topRight: Radius.circular(0),
@@ -119,24 +104,18 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 20.sp,
-                      color: const Color(0xFF2C2C2E),
+                      color: darkTextPrimary,
                     ),
                   ),
                   const Spacer(),
                   Container(
                     decoration: BoxDecoration(
-                      color: neumorphicBackground,
+                      color: darkCardColor,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: neumorphicShadowDark,
-                          offset: Offset(2.sp, 2.sp),
-                          blurRadius: 4.sp,
-                          spreadRadius: 0,
-                        ),
-                        BoxShadow(
-                          color: neumorphicShadowLight,
-                          offset: Offset(-2.sp, -2.sp),
+                          color: Colors.black.withOpacity(0.3),
+                          offset: Offset(0, 2.sp),
                           blurRadius: 4.sp,
                           spreadRadius: 0,
                         ),
@@ -146,7 +125,7 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
                       onPressed: () => Navigator.of(context).pop(),
                       icon: Icon(
                         Icons.close,
-                        color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                        color: darkTextSecondary,
                         size: 20.sp,
                       ),
                     ),
@@ -161,19 +140,19 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
                 title: 'ユーザー名',
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 4.sp),
-                  decoration: neumorphicInsetDecoration,
+                  decoration: darkInputDecoration,
                   child: TextField(
                     controller: _usernameController,
                     style: GoogleFonts.inter(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF2C2C2E).withOpacity(0.85),
+                      color: darkTextPrimary,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'ユーザー名を入力',
                       hintStyle: TextStyle(
-                        color: Color(0xFF8E8E93),
+                        color: darkTextSecondary,
                       ),
                       contentPadding: EdgeInsets.zero,
                     ),
@@ -189,19 +168,19 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
                 title: '一言コメント',
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 4.sp),
-                  decoration: neumorphicInsetDecoration,
+                  decoration: darkInputDecoration,
                   child: TextField(
                     controller: _commentController,
                     style: GoogleFonts.inter(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF2C2C2E).withOpacity(0.85),
+                      color: darkTextPrimary,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: '一言コメントを入力',
                       hintStyle: TextStyle(
-                        color: Color(0xFF8E8E93),
+                        color: darkTextSecondary,
                       ),
                       contentPadding: EdgeInsets.zero,
                     ),
@@ -212,7 +191,7 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
                         '$currentLength/${maxLength ?? 0}',
                         style: GoogleFonts.inter(
                           fontSize: 10.sp,
-                          color: const Color(0xFF8E8E93),
+                          color: darkTextSecondary,
                         ),
                       );
                     },
@@ -226,7 +205,7 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
               _buildSettingSection(
                 title: 'データ管理',
                 child: Container(
-                  decoration: neumorphicDecoration,
+                  decoration: darkCardDecoration,
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -318,7 +297,7 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
           title,
           style: GoogleFonts.inter(
             fontSize: 14.sp,
-            color: const Color(0xFF2C2C2E).withOpacity(0.7),
+            color: darkTextSecondary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -351,11 +330,11 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
             content: Text(
               '設定を保存しました',
               style: GoogleFonts.inter(
-                color: const Color(0xFFE0E5EC),
+                color: darkTextPrimary,
                 fontSize: 12.sp,
               ),
             ),
-            backgroundColor: const Color(0xFF2C2C2E),
+            backgroundColor: darkCardColor,
             duration: const Duration(seconds: 2),
           ),
         );
@@ -368,7 +347,7 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
             content: Text(
               '設定の保存に失敗しました',
               style: GoogleFonts.inter(
-                color: const Color(0xFFE0E5EC),
+                color: darkTextPrimary,
                 fontSize: 12.sp,
               ),
             ),
@@ -395,14 +374,14 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: neumorphicBackground,
+          backgroundColor: darkCardColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.sp),
           ),
           title: Text(
             'すべてのデータを削除',
             style: GoogleFonts.inter(
-              color: const Color(0xFF2C2C2E),
+              color: darkTextPrimary,
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -410,7 +389,7 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
           content: Text(
             'すべてのワークアウト記録とXPが削除されます。\nこの操作は取り消せません。',
             style: GoogleFonts.inter(
-              color: const Color(0xFF2C2C2E).withOpacity(0.8),
+              color: darkTextSecondary,
               fontSize: 14.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -425,8 +404,8 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
                     child: ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFCED3D9),
-                        foregroundColor: const Color(0xFF2C2C2E),
+                        backgroundColor: darkTextSecondary,
+                        foregroundColor: darkBackground,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.sp),
@@ -501,11 +480,11 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
             content: Text(
               'すべてのデータを削除しました',
               style: GoogleFonts.inter(
-                color: const Color(0xFFE0E5EC),
+                color: darkTextPrimary,
                 fontSize: 12.sp,
               ),
             ),
-            backgroundColor: const Color(0xFF2C2C2E),
+            backgroundColor: darkCardColor,
             duration: const Duration(seconds: 2),
           ),
         );
@@ -521,7 +500,7 @@ BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
             content: Text(
               'データの削除に失敗しました',
               style: GoogleFonts.inter(
-                color: const Color(0xFFE0E5EC),
+                color: darkTextPrimary,
                 fontSize: 12.sp,
               ),
             ),

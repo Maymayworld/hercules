@@ -12,45 +12,34 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
   final VoidCallback onDelete;
   final Function(int exerciseId)? onDeleteExercise; // 個別エクササイズ削除用コールバック
 
-  // ニューモーフィック用の色定義
-  static const Color neumorphicBackground = Color(0xFFE0E5EC);
-  static const Color neumorphicShadowDark = Color(0xFFA3B1C6);
-  static const Color neumorphicShadowLight = Color(0xFFFFFFFF);
+  // ダークテーマ用の色定義
+  static const Color darkBackground = Color(0xFF1C1C1C);
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
-  // ニューモーフィックスタイル用のBoxDecoration
-  BoxDecoration get neumorphicDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // ダークテーマ用のBoxDecoration
+  BoxDecoration get darkCardDecoration => BoxDecoration(
+    color: darkCardColor,
     borderRadius: BorderRadius.circular(12.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(4.sp, 4.sp),
-        blurRadius: 8.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-4.sp, -4.sp),
+        color: Colors.black.withOpacity(0.3),
+        offset: Offset(0, 2.sp),
         blurRadius: 8.sp,
         spreadRadius: 0,
       ),
     ],
   );
 
-  // 押し込まれたニューモーフィックスタイル
-  BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // 押し込まれたダークテーマスタイル
+  BoxDecoration get darkCardInsetDecoration => BoxDecoration(
+    color: darkBackground,
     borderRadius: BorderRadius.circular(12.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(2.sp, 2.sp),
-        blurRadius: 4.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(-2.sp, -2.sp),
+        color: Colors.black.withOpacity(0.5),
+        offset: Offset(0, 1.sp),
         blurRadius: 4.sp,
         spreadRadius: 0,
       ),
@@ -70,16 +59,16 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
     
     return Container(
       margin: EdgeInsets.only(bottom: 12.sp),
-      decoration: neumorphicDecoration,
+      decoration: darkCardDecoration,
       child: ExpansionTile(
         tilePadding: EdgeInsets.symmetric(
           horizontal: 16.sp,
           vertical: 8.sp,
         ),
-        backgroundColor: neumorphicBackground,
-        collapsedBackgroundColor: neumorphicBackground,
+        backgroundColor: darkCardColor,
+        collapsedBackgroundColor: darkCardColor,
         iconColor: Colors.red,
-        collapsedIconColor: const Color(0xFF2C2C2E).withOpacity(0.6),
+        collapsedIconColor: darkTextSecondary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.sp),
         ),
@@ -98,13 +87,22 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
               child: Container(
                 width: 32.sp,
                 height: 32.sp,
-                decoration: neumorphicDecoration.copyWith(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(8.sp),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      offset: Offset(0, 1.sp),
+                      blurRadius: 2.sp,
+                      spreadRadius: 0,
+                    ),
+                  ],
                 ),
                 child: Icon(
                   Icons.delete_outline,
                   size: 16.sp,
-                  color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                  color: Colors.red.withOpacity(0.8),
                 ),
               ),
             ),
@@ -120,7 +118,7 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
                     session.formattedDateTime,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF2C2C2E),
+                      color: darkTextPrimary,
                       fontSize: 14.sp,
                     ),
                   ),
@@ -141,7 +139,7 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
         children: [
           // Divider
           Divider(
-            color: const Color(0xFF2C2C2E).withOpacity(0.2),
+            color: darkTextSecondary.withOpacity(0.3),
             thickness: 0.5,
             height: 1,
           ),
@@ -155,7 +153,7 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
                 '種目',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF2C2C2E),
+                  color: darkTextPrimary,
                   fontSize: 13.sp,
                 ),
               ),
@@ -196,12 +194,21 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
             child: Container(
               width: 32.sp,
               height: 32.sp,
-              decoration: neumorphicDecoration.copyWith(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9),
                 borderRadius: BorderRadius.circular(8.sp),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    offset: Offset(0, 1.sp),
+                    blurRadius: 2.sp,
+                    spreadRadius: 0,
+                  ),
+                ],
               ),
               child: Icon(
                 Icons.delete_outline,
-                color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                color: Colors.red.withOpacity(0.8),
                 size: 18.sp,
               ),
             ),
@@ -218,7 +225,7 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
                   exercise.name,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2C2C2E),
+                    color: darkTextPrimary,
                     fontSize: 14.sp,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -228,7 +235,7 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
                 Text(
                   record.displayValue,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                    color: darkTextSecondary,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -268,7 +275,7 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
             '獲得XP詳細',
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF2C2C2E),
+              color: darkTextPrimary,
               fontSize: 13.sp,
             ),
           ),
@@ -286,14 +293,14 @@ class ExpandableWorkoutTile extends HookConsumerWidget {
                         height: 6.sp,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFF2c2c2e).withOpacity(0.7),
+                          color: darkTextSecondary,
                         ),
                       ),
                       SizedBox(width: 12.sp),
                       Text(
                         entry.key,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF2C2C2E),
+                          color: darkTextPrimary,
                           fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
                         ),

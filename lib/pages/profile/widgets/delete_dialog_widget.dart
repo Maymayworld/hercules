@@ -5,8 +5,11 @@ import '../../exercise/data/exercise_data.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DeleteDialogWidget {
-  // ニューモーフィック用の色定義
-  static const Color neumorphicBackground = Color(0xFFE0E5EC);
+  // ダークテーマ用の色定義
+  static const Color darkBackground = Color(0xFF1C1C1C);
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
   /// ワークアウトセッション全体を削除する確認ダイアログを表示
   static void showDeleteWorkoutDialog({
@@ -17,14 +20,14 @@ class DeleteDialogWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: neumorphicBackground,
+        backgroundColor: darkCardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.sp),
         ),
         title: Text(
           '記録を削除',
           style: GoogleFonts.inter(
-            color: const Color(0xFF2C2C2E),
+            color: darkTextPrimary,
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -32,7 +35,7 @@ class DeleteDialogWidget {
         content: Text(
           'この記録を削除しますか？\n獲得した${totalXP}XPも失われます。',
           style: GoogleFonts.inter(
-            color: const Color(0xFF2C2C2E).withOpacity(0.8),
+            color: darkTextSecondary,
             fontSize: 14.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -47,8 +50,8 @@ class DeleteDialogWidget {
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFCED3D9),
-                      foregroundColor: const Color(0xFF2C2C2E),
+                      backgroundColor: darkTextSecondary,
+                      foregroundColor: darkBackground,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.sp),
@@ -109,14 +112,14 @@ class DeleteDialogWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: neumorphicBackground,
+        backgroundColor: darkCardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.sp),
         ),
         title: Text(
           'エクササイズを削除',
           style: GoogleFonts.inter(
-            color: const Color(0xFF2C2C2E),
+            color: darkTextPrimary,
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -124,7 +127,7 @@ class DeleteDialogWidget {
         content: Text(
           '${exercise.name}をこの記録から削除しますか？\n獲得した${exerciseXP}XPも失われます。',
           style: GoogleFonts.inter(
-            color: const Color(0xFF2C2C2E).withOpacity(0.8),
+            color: darkTextSecondary,
             fontSize: 14.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -139,8 +142,8 @@ class DeleteDialogWidget {
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFCED3D9),
-                      foregroundColor: const Color(0xFF2C2C2E),
+                      backgroundColor: darkTextSecondary,
+                      foregroundColor: darkBackground,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.sp),

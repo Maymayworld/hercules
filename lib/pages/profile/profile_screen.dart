@@ -4,6 +4,8 @@ import 'package:hercules_5/main/home.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sizer/sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 import '../../providers/xp_level_provider.dart';
 import '../../providers/workout_sessions_provider.dart';
 import '../../providers/persistent_xp_provider.dart';
@@ -30,17 +32,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
   late TabController _tabController;
   String _username = 'ユーザー名'; // デフォルト値
   String _comment = '今日も頑張ろう！'; // デフォルトコメント
+  String? _profileImagePath; // プロフィール画像のパス
   bool _isLoadingUsername = true; // ユーザー名読み込み中フラグ
   bool _isLoadingComment = true; // コメント読み込み中フラグ
+  bool _isLoadingProfileImage = true; // プロフィール画像読み込み中フラグ
 
-  // ニューモーフィック用の色定義
-  static const Color neumorphicBackground = Color(0xFFE0E5EC);
-  static const Color neumorphicShadowDark = Color(0xFFA3B1C6);
-  static const Color neumorphicShadowLight = Color(0xFFFFFFFF);
+  // ダークテーマ用の色定義
+  static const Color darkBackground = Color(0xFF1C1C1C);
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
   // SharedPreferencesキー
   static const String _usernameKey = 'user_profile_username';
   static const String _commentKey = 'user_profile_comment';
+  static const String _profileImageKey = 'user_profile_image_path';
+
+
 
   @override
   void initState() {
@@ -48,6 +56,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
     _tabController = TabController(length: 2, vsync: this, initialIndex: 0);
     _loadUsername(); // ユーザー名を読み込み
     _loadComment(); // コメントを読み込み
+    _loadProfileImage(); // プロフィール画像を読み込み
   }
 
   @override
@@ -113,6 +122,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
     }
   }
 
+  // SharedPreferencesからプロフィール画像を読み込み
+  Future<void> _loadProfileImage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedImagePath = prefs.getString(_profileImageKey);
+      
+      if (mounted) {
+        setState(() {
+          _profileImagePath = savedImagePath;
+          _isLoadingProfileImage = false;
+        });
+      }
+    } catch (e) {
+      print('Failed to load profile image: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingProfileImage = false;
+        });
+      }
+    }
+  }
+
   // SharedPreferencesにユーザー名を保存
   Future<void> _saveUsername(String newUsername) async {
     try {
@@ -157,40 +188,96 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
     }
   }
 
-  // ニューモーフィックスタイル用のBoxDecoration
-  BoxDecoration get neumorphicDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // SharedPreferencesにプロフィール画像パスを保存
+  Future<void> _saveProfileImagePath(String imagePath) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_profileImageKey, imagePath);
+      
+      if (mounted) {
+        setState(() {
+          _profileImagePath = imagePath;
+        });
+      }
+    } catch (e) {
+      print('Failed to save profile image path: $e');
+      // エラーが発生した場合でも状態は更新する（UI応答性のため）
+      if (mounted) {
+        setState(() {
+          _profileImagePath = imagePath;
+        });
+      }
+    }
+  }
+
+  // プロフィール画像を選択
+  Future<void> _pickProfileImage() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
+      );
+      
+      if (result != null && result.files.single.path != null) {
+        final imagePath = result.files.single.path!;
+        await _saveProfileImagePath(imagePath);
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'プロフィール画像を更新しました',
+                style: GoogleFonts.inter(
+                  color: darkTextPrimary,
+                  fontSize: 12.sp,
+                ),
+              ),
+              backgroundColor: darkCardColor,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Failed to pick profile image: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '画像の選択に失敗しました',
+              style: GoogleFonts.inter(
+                color: darkTextPrimary,
+                fontSize: 12.sp,
+              ),
+            ),
+            backgroundColor: darkCardColor,
+          ),
+        );
+      }
+    }
+  }
+
+  // ダークテーマ用のBoxDecoration
+  BoxDecoration get darkCardDecoration => BoxDecoration(
+    color: darkCardColor,
     borderRadius: BorderRadius.circular(12.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(4.sp, 4.sp),
-        blurRadius: 8.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-4.sp, -4.sp),
+        color: Colors.black.withOpacity(0.3),
+        offset: Offset(0, 2.sp),
         blurRadius: 8.sp,
         spreadRadius: 0,
       ),
     ],
   );
 
-  // 押し込まれたニューモーフィックスタイル（内側シャドウ効果）
-  BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // 押し込まれたダークテーマスタイル
+  BoxDecoration get darkCardInsetDecoration => BoxDecoration(
+    color: darkCardColor,
     borderRadius: BorderRadius.circular(12.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(2.sp, 2.sp),
-        blurRadius: 4.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-2.sp, -2.sp),
+        color: Colors.black.withOpacity(0.5),
+        offset: Offset(0, 1.sp),
         blurRadius: 4.sp,
         spreadRadius: 0,
       ),
@@ -203,7 +290,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
     final levelInfoAsync = ref.watch(xpLevelManagerProvider);
     
     return Scaffold(
-      backgroundColor: neumorphicBackground,
+      backgroundColor: darkBackground,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -219,18 +306,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
             width: 32.sp, // ボタン全体のサイズを明示的に指定
             height: 32.sp, // ボタン全体のサイズを明示的に指定
             decoration: BoxDecoration(
-              color: neumorphicBackground,
+              color: darkCardColor,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: neumorphicShadowDark,
-                  offset: Offset(2.sp, 2.sp),
-                  blurRadius: 4.sp,
-                  spreadRadius: 0,
-                ),
-                BoxShadow(
-                  color: neumorphicShadowLight,
-                  offset: Offset(-2.sp, -2.sp),
+                  color: Colors.black.withOpacity(0.3),
+                  offset: Offset(0, 2.sp),
                   blurRadius: 4.sp,
                   spreadRadius: 0,
                 ),
@@ -242,7 +323,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
               onPressed: () => _showSettingsModal(context),
               icon: Icon(
                 Icons.settings,
-                color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                color: darkTextSecondary,
                 size: 16.sp,
               ),
             ),
@@ -266,7 +347,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
                 Text(
                   'データの読み込みに失敗しました',
                   style: GoogleFonts.inter(
-                    color: const Color(0xFF2C2C2E),
+                    color: darkTextPrimary,
                     fontSize: 14.sp,
                   ),
                 ),
@@ -288,160 +369,134 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
 
   Widget _buildContent(BuildContext context, Map<String, LevelInfo> levelInfo) {
     final theme = Theme.of(context);
-    final overallInfo = levelInfo['総合'];
     
     return Column(
       children: [
-        // プロフィール上部（改善版）
+        // プロフィール上部（修正版）
         Container(
           padding: EdgeInsets.symmetric(horizontal: 20.sp),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              // 上段：アイコン、レベル、ランクを横一列に配置
-              Row(
-                children: [
-                  // プロフィール写真
-                  CircleAvatar(
-                    radius: 28.sp,
-                    backgroundColor: const Color(0xFF2C2C2E).withOpacity(0.8),
-                    child: Icon(
-                      Icons.person,
-                      size: 20.sp,
-                      color: Colors.white,
-                    ),
-                  ),
-                  
-                  SizedBox(width: 20.sp),
-                  
-                  // レベル（ニューモーフィック）
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 8.sp),
-                      decoration: neumorphicDecoration,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'レベル',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: const Color(0xFF2C2C2E).withOpacity(0.6),
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          SizedBox(height: 2.sp),
-                          Text(
-                            'Lv.${overallInfo?.level ?? 1}',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: Colors.red,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+              // プロフィール写真（タップで変更可能）
+              GestureDetector(
+                onTap: _pickProfileImage,
+                child: Container(
+                  width: 80.sp,
+                  height: 80.sp,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        offset: Offset(0, 4.sp),
+                        blurRadius: 8.sp,
+                        spreadRadius: 0,
                       ),
-                    ),
+                    ],
                   ),
-                  
-                  SizedBox(width: 16.sp),
-                  
-                  // ランク（ニューモーフィック）
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 8.sp),
-                      decoration: neumorphicDecoration,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'ランク',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: const Color(0xFF2C2C2E).withOpacity(0.6),
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
+                  child: ClipOval(
+                    child: _isLoadingProfileImage
+                        ? Container(
+                            color: darkCardColor,
+                            child: Icon(
+                              Icons.person,
+                              size: 40.sp,
+                              color: darkTextSecondary,
                             ),
-                          ),
-                          SizedBox(height: 2.sp),
-                          Text(
-                            overallInfo?.rank ?? 'E',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: Colors.red,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                          )
+                        : _profileImagePath != null && File(_profileImagePath!).existsSync()
+                            ? Image.file(
+                                File(_profileImagePath!),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: darkCardColor,
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 40.sp,
+                                      color: darkTextSecondary,
+                                    ),
+                                  );
+                                },
+                              )
+                            : Container(
+                                color: darkCardColor,
+                                child: Icon(
+                                  Icons.person,
+                                  size: 40.sp,
+                                  color: darkTextSecondary,
+                                ),
+                              ),
                   ),
-                ],
+                ),
               ),
               
-              SizedBox(height: 8.sp),
+              SizedBox(width: 20.sp),
               
-              // 下段：名前と一言コメントを左揃えで配置
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ユーザー名
-                  _isLoadingUsername
-                      ? Container(
-                          height: 18.sp,
-                          width: 100.sp,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2C2C2E).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4.sp),
+              // 名前とコメント（プロフィール画像の右側）
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ユーザー名
+                    _isLoadingUsername
+                        ? Container(
+                            height: 24.sp,
+                            width: 120.sp,
+                            decoration: BoxDecoration(
+                              color: darkCardColor,
+                              borderRadius: BorderRadius.circular(4.sp),
+                            ),
+                          )
+                        : Text(
+                            _username,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: darkTextPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.sp,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
-                        )
-                      : Text(
-                          _username,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: const Color(0xFF2C2C2E),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16.sp,
+                    
+                    SizedBox(height: 8.sp),
+                    
+                    // 一言コメント
+                    _isLoadingComment
+                        ? Container(
+                            height: 16.sp,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: darkCardColor,
+                              borderRadius: BorderRadius.circular(4.sp),
+                            ),
+                          )
+                        : Text(
+                            _comment,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: darkTextSecondary,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                  
-                  SizedBox(height: 4.sp),
-                  
-                  // 一言コメント
-                  _isLoadingComment
-                      ? Container(
-                          height: 14.sp,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2C2C2E).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4.sp),
-                          ),
-                        )
-                      : Text(
-                          _comment,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: const Color(0xFF2C2C2E).withOpacity(0.7),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
         ),
         
+        SizedBox(height: 20.sp),
+        
         // タブバー（アイコン版）
         Container(
           child: TabBar(
             controller: _tabController,
-            labelColor: const Color(0xFF2C2C2E),
-            unselectedLabelColor: const Color(0xFF2C2C2E).withOpacity(0.6),
-            dividerColor: const Color(0xFF2C2C2E).withOpacity(0.3),
+            labelColor: darkTextPrimary,
+            unselectedLabelColor: darkTextSecondary,
+            dividerColor: darkTextSecondary.withOpacity(0.3),
             dividerHeight: 0.5,
             indicatorColor: Colors.red,
             overlayColor: WidgetStateProperty.all(Colors.transparent),
@@ -466,7 +521,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
         // タブビュー
         Expanded(
           child: Container(
-            color: neumorphicBackground,
+            color: darkBackground,
             child: TabBarView(
               controller: _tabController,
               children: [
@@ -526,20 +581,23 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
               // デフォルトの初期状態
               return Container(
                 padding: EdgeInsets.all(16.sp),
-                decoration: neumorphicDecoration,
+                decoration: darkCardDecoration,
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // サークルゲージ（背景）- サイズは固定のまま
-                    SizedBox(
-                      width: 80.sp,
-                      height: 80.sp,
-                      child: CircularProgressIndicator(
-                        value: 0.0,
-                        strokeWidth: 6.sp,
-                        strokeCap: StrokeCap.round, // ゲージの端を角丸に
-                        backgroundColor: neumorphicShadowDark.withOpacity(0.3),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+                    // サークルゲージ（背景）- 正円を保つ
+                    AspectRatio(
+                      aspectRatio: 1.0,
+                      child: SizedBox(
+                        width: 80.sp,
+                        height: 80.sp,
+                        child: CircularProgressIndicator(
+                          value: 0.0,
+                          strokeWidth: 6.sp,
+                          strokeCap: StrokeCap.round,
+                          backgroundColor: darkTextSecondary.withOpacity(0.3),
+                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+                        ),
                       ),
                     ),
                     // 中央のテキスト
@@ -552,7 +610,7 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w500,
-                            color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                            color: darkTextSecondary,
                           ),
                         ),
                         SizedBox(height: 2.sp),
@@ -562,7 +620,7 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
                           style: theme.textTheme.bodyLarge?.copyWith(
                             fontSize: 18.sp,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF2C2C2E),
+                            color: darkTextPrimary,
                           ),
                         ),
                       ],
@@ -574,20 +632,23 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
             
             return Container(
               padding: EdgeInsets.all(16.sp),
-              decoration: neumorphicDecoration,
+              decoration: darkCardDecoration,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // サークルゲージ - サイズは固定のまま
-                  SizedBox(
-                    width: 80.sp,
-                    height: 80.sp,
-                    child: CircularProgressIndicator(
-                      value: info.progress,
-                      strokeWidth: 6.sp,
-                      strokeCap: StrokeCap.round, // ゲージの端を角丸に
-                      backgroundColor: neumorphicShadowDark.withOpacity(0.3),
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+                  // サークルゲージ - 正円を保つ
+                  AspectRatio(
+                    aspectRatio: 1.0,
+                    child: SizedBox(
+                      width: 80.sp,
+                      height: 80.sp,
+                      child: CircularProgressIndicator(
+                        value: info.progress,
+                        strokeWidth: 6.sp,
+                        strokeCap: StrokeCap.round,
+                        backgroundColor: darkTextSecondary.withOpacity(0.3),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+                      ),
                     ),
                   ),
                   // 中央のテキスト
@@ -600,7 +661,7 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                          color: darkTextSecondary,
                         ),
                       ),
                       SizedBox(height: 2.sp),
@@ -610,7 +671,7 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF2C2C2E),
+                          color: darkTextPrimary,
                         ),
                       ),
                     ],
@@ -660,11 +721,11 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
           Container(
             width: 80.sp,
             height: 80.sp,
-            decoration: neumorphicDecoration,
+            decoration: darkCardDecoration,
             child: Icon(
               Icons.history,
               size: 40.sp,
-              color: const Color(0xFF2C2C2E).withOpacity(0.3),
+              color: darkTextSecondary,
             ),
           ),
           
@@ -674,7 +735,7 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
             'ワークアウト記録がありません',
             style: theme.textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF2C2C2E).withOpacity(0.6),
+              color: darkTextPrimary,
               fontSize: 16.sp,
             ),
           ),
@@ -685,7 +746,7 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
             'エクササイズを記録して\n成長の軌跡を追跡しましょう',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: const Color(0xFF2C2C2E).withOpacity(0.5),
+              color: darkTextSecondary,
               fontSize: 14.sp,
               fontWeight: FontWeight.bold
             ),
@@ -709,11 +770,11 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
             content: Text(
               '記録を削除しました（${session.totalXPSum}XP減少）',
               style: GoogleFonts.inter(
-                color: const Color(0xFFE0E5EC),
+                color: darkTextPrimary,
                 fontSize: 12.sp,
               ),
             ),
-            backgroundColor: const Color(0xFF2C2C2E),
+            backgroundColor: darkCardColor,
           ),
         );
       }
@@ -725,11 +786,11 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
             content: Text(
               '記録の削除に失敗しました',
               style: GoogleFonts.inter(
-                color: const Color(0xFFE0E5EC),
+                color: darkTextPrimary,
                 fontSize: 12.sp,
               ),
             ),
-            backgroundColor: const Color(0xFF2C2C2E),
+            backgroundColor: darkCardColor,
           ),
         );
       }
@@ -809,11 +870,11 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
             content: Text(
               '${exercise.name}を削除しました（${totalDeletedXP}XP減少）',
               style: GoogleFonts.inter(
-                color: const Color(0xFFE0E5EC),
+                color: darkTextPrimary,
                 fontSize: 12.sp,
               ),
             ),
-            backgroundColor: const Color(0xFF2C2C2E),
+            backgroundColor: darkCardColor,
           ),
         );
       }
@@ -825,11 +886,11 @@ Widget _buildLevelTab(BuildContext context, Map<String, LevelInfo> levelInfo) {
             content: Text(
               'エクササイズの削除に失敗しました',
               style: GoogleFonts.inter(
-                color: const Color(0xFFE0E5EC),
+                color: darkTextPrimary,
                 fontSize: 12.sp,
               ),
             ),
-            backgroundColor: const Color(0xFF2C2C2E),
+            backgroundColor: darkCardColor,
           ),
         );
       }
