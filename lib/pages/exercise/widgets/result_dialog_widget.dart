@@ -13,25 +13,20 @@ class ResultDialogWidget extends ConsumerWidget {
   final Map<int, ExerciseRecord> exerciseRecords;
   final VoidCallback onComplete;
 
-  // ニューモーフィック用の色定義
-  static const Color neumorphicBackground = Color(0xFFE0E5EC);
-  static const Color neumorphicShadowDark = Color(0xFFA3B1C6);
-  static const Color neumorphicShadowLight = Color(0xFFFFFFFF);
+  // ダークテーマ用の色定義
+  static const Color darkBackground = Color(0xFF1C1C1C);
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
-  // ニューモーフィックスタイル用のBoxDecoration
-  BoxDecoration get neumorphicDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // ダークテーマ用のBoxDecoration
+  BoxDecoration get darkCardDecoration => BoxDecoration(
+    color: darkCardColor,
     borderRadius: BorderRadius.circular(12.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(4.sp, 4.sp),
-        blurRadius: 8.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-4.sp, -4.sp),
+        color: Colors.black.withOpacity(0.3),
+        offset: Offset(0, 2.sp),
         blurRadius: 8.sp,
         spreadRadius: 0,
       ),
@@ -58,8 +53,16 @@ class ResultDialogWidget extends ConsumerWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.9,
         ),
         decoration: BoxDecoration(
-          color: neumorphicBackground,
+          color: darkBackground,
           borderRadius: BorderRadius.circular(20.sp),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              offset: Offset(0, 4.sp),
+              blurRadius: 16.sp,
+              spreadRadius: 0,
+            ),
+          ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -103,7 +106,7 @@ class ResultDialogWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: const Color(0xFF2C2C2E).withOpacity(0.1),
+            color: darkTextSecondary.withOpacity(0.3),
             width: 1,
           ),
         ),
@@ -114,7 +117,7 @@ class ResultDialogWidget extends ConsumerWidget {
           Container(
             width: 40.sp,
             height: 40.sp,
-            decoration: neumorphicDecoration,
+            decoration: darkCardDecoration,
             child: Icon(
               Icons.check_circle_outline,
               color: Colors.red,
@@ -130,7 +133,7 @@ class ResultDialogWidget extends ConsumerWidget {
                 style: GoogleFonts.inter(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF2C2C2E),
+                  color: darkTextPrimary,
                 ),
               ),
             ),
@@ -169,7 +172,7 @@ class ResultDialogWidget extends ConsumerWidget {
                         height: 7.sp,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                          color: darkTextSecondary,
                         ),
                       ),
                       SizedBox(width: 12.sp),
@@ -178,7 +181,7 @@ class ResultDialogWidget extends ConsumerWidget {
                         style: GoogleFonts.inter(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF2C2C2E),
+                          color: darkTextPrimary,
                         ),
                       ),
                     ],

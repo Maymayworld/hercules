@@ -11,25 +11,20 @@ class ExerciseTileWidget extends HookConsumerWidget {
   final Exercise exercise;
   final VoidCallback? onTap;
 
-  // ニューモーフィック用の色定義
-  static const Color neumorphicBackground = Color(0xFFE0E5EC);
-  static const Color neumorphicShadowDark = Color(0xFFA3B1C6);
-  static const Color neumorphicShadowLight = Color(0xFFFFFFFF);
+  // ダークテーマ用の色定義
+  static const Color darkBackground = Color(0xFF1C1C1C);
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
-  // ニューモーフィックスタイル用のBoxDecoration
-  BoxDecoration get neumorphicDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // ダークテーマ用のBoxDecoration
+  BoxDecoration get darkCardDecoration => BoxDecoration(
+    color: darkCardColor,
     borderRadius: BorderRadius.circular(10.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(2.sp, 2.sp),
-        blurRadius: 4.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-2.sp, -2.sp),
+        color: Colors.black.withOpacity(0.2),
+        offset: Offset(0, 1.sp),
         blurRadius: 4.sp,
         spreadRadius: 0,
       ),
@@ -58,18 +53,18 @@ class ExerciseTileWidget extends HookConsumerWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: const Color(0xFF2C2C2E).withOpacity(0.1),
+              color: darkTextSecondary.withOpacity(0.2),
               width: 1,
             ),
           ),
         ),
         child: Row(
           children: [
-            // 左側：メイン部位のアイコン（ニューモーフィック）
+            // 左側：メイン部位のアイコン（ダークテーマ）
             Container(
               width: 40.sp,
               height: 40.sp,
-              decoration: neumorphicDecoration,
+              decoration: darkCardDecoration,
               child: Icon(
                 _getExerciseIcon(),
                 color: exercise.mainBodyPart.color, // 部位別の色
@@ -95,7 +90,7 @@ class ExerciseTileWidget extends HookConsumerWidget {
                           exercise.name,
                           style: theme.textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF2C2C2E),
+                            color: darkTextPrimary,
                           ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
@@ -104,7 +99,7 @@ class ExerciseTileWidget extends HookConsumerWidget {
                       
                       SizedBox(width: 8.sp),
                       
-                      // 記録表示（右上）- neumorphicボックス内に配置
+                      // 記録表示（右上）- ダークテーマボックス内に配置
                       if (isRecording && exerciseRecord != null && 
                           (exerciseRecord.repetitions != null && exerciseRecord.repetitions! > 0 ||
                            exerciseRecord.duration != null && exerciseRecord.duration!.inSeconds > 0))
@@ -113,7 +108,7 @@ class ExerciseTileWidget extends HookConsumerWidget {
                             horizontal: 8.sp,
                             vertical: 4.sp,
                           ),
-                          decoration: neumorphicDecoration.copyWith(
+                          decoration: darkCardDecoration.copyWith(
                             borderRadius: BorderRadius.circular(8.sp),
                           ),
                           child: Text(
@@ -143,7 +138,7 @@ class ExerciseTileWidget extends HookConsumerWidget {
                               child: Text(
                                 part,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                                  color: darkTextSecondary,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 11.sp,
                                 ),
@@ -163,7 +158,7 @@ class ExerciseTileWidget extends HookConsumerWidget {
             if (!isRecording)
               Icon(
                 Icons.chevron_right,
-                color: const Color(0xFF2C2C2E).withOpacity(0.4),
+                color: darkTextSecondary,
                 size: 20.sp,
               ),
           ],

@@ -16,10 +16,11 @@ import 'package:google_fonts/google_fonts.dart';
 class ExerciseScreen extends HookConsumerWidget {
   const ExerciseScreen({super.key});
 
-  // ニューモーフィック用の色定義
-  static const Color neumorphicBackground = Color(0xFFE0E5EC);
-  static const Color neumorphicShadowDark = Color(0xFFA3B1C6);
-  static const Color neumorphicShadowLight = Color(0xFFFFFFFF);
+  // ダークテーマ用の色定義
+  static const Color darkBackground = Color(0xFF1C1C1C);
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
   // 50音順でソートされたエクササイズリストを取得
   static List<Exercise> get sortedExercises {
@@ -28,44 +29,28 @@ class ExerciseScreen extends HookConsumerWidget {
     return exercises;
   }
 
-  // ニューモーフィックスタイル用のBoxDecoration
-  BoxDecoration get neumorphicDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // ダークテーマ用のBoxDecoration
+  BoxDecoration get darkCardDecoration => BoxDecoration(
+    color: darkCardColor,
     borderRadius: BorderRadius.circular(12.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(4.sp, 4.sp),
-        blurRadius: 8.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-4.sp, -4.sp),
+        color: Colors.black.withOpacity(0.3),
+        offset: Offset(0, 2.sp),
         blurRadius: 8.sp,
         spreadRadius: 0,
       ),
     ],
   );
 
-  // 押し込まれたニューモーフィックスタイル
-  BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // 入力フィールド用のダークテーマスタイル
+  BoxDecoration get darkInputDecoration => BoxDecoration(
+    color: darkBackground,
     borderRadius: BorderRadius.circular(12.sp),
-    boxShadow: [
-      BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(2.sp, 2.sp),
-        blurRadius: 4.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-2.sp, -2.sp),
-        blurRadius: 4.sp,
-        spreadRadius: 0,
-      ),
-    ],
+    border: Border.all(
+      color: darkTextSecondary.withOpacity(0.3),
+      width: 1,
+    ),
   );
 
   @override
@@ -127,7 +112,7 @@ class ExerciseScreen extends HookConsumerWidget {
     final theme = Theme.of(context);
     
     return Scaffold(
-      backgroundColor: neumorphicBackground,
+      backgroundColor: darkBackground,
       body: SafeArea(
         child: Stack(
           children: [
@@ -137,18 +122,18 @@ class ExerciseScreen extends HookConsumerWidget {
                 Container(
                   padding: EdgeInsets.only(top: 16.sp, bottom: 4.sp, right: 16.sp, left: 16.sp),
                   child: Container(
-                    decoration: neumorphicDecoration,
+                    decoration: darkInputDecoration,
                     child: TextField(
                       controller: searchController,
                       decoration: InputDecoration(
                         hintText: '種目名で検索...',
                         hintStyle: GoogleFonts.inter(
-                          color: const Color(0xFF2C2C2E).withOpacity(0.6),
+                          color: darkTextSecondary,
                           fontSize: 14.sp,
                         ),
                         prefixIcon: Icon(
                           Icons.search,
-                          color: const Color(0xFF2C2C2E).withOpacity(0.6),
+                          color: darkTextSecondary,
                           size: 20.sp,
                         ),
                         border: InputBorder.none,
@@ -158,7 +143,7 @@ class ExerciseScreen extends HookConsumerWidget {
                         ),
                       ),
                       style: GoogleFonts.inter(
-                        color: const Color(0xFF2C2C2E),
+                        color: darkTextPrimary,
                         fontSize: 14.sp,
                       ),
                     ),
@@ -262,7 +247,7 @@ class ExerciseScreen extends HookConsumerWidget {
                 // 種目リスト
                 Expanded(
                   child: Container(
-                    color: neumorphicBackground, // 背景色を統一
+                    color: darkBackground, // 背景色を統一
                     child: filteredExercises.value.isEmpty
                         ? _buildEmptyState(context, clearAllFilters)
                         : ListView.builder(
@@ -324,8 +309,8 @@ class ExerciseScreen extends HookConsumerWidget {
         child: isRecording
           ? FloatingActionButton.extended(
               onPressed: () => _handleFABPress(context, ref, isRecording, exerciseRecords),
-              backgroundColor: hasRecords ? Colors.red : const Color(0xFFCED3D9),
-              foregroundColor: hasRecords ? Colors.white : const Color(0xFF2c2c2c),
+              backgroundColor: hasRecords ? Colors.red : darkTextSecondary,
+              foregroundColor: hasRecords ? Colors.white : darkBackground,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24.sp), // 28.sp → 24.spに変更
               ),
@@ -406,7 +391,14 @@ Widget _buildFilterChip({
         horizontal: 6.sp,
         vertical: 8.sp,
       ),
-      decoration: isSelected ? neumorphicInsetDecoration : neumorphicDecoration,
+      decoration: BoxDecoration(
+        color: isSelected ? Colors.red.withOpacity(0.2) : darkCardColor,
+        borderRadius: BorderRadius.circular(12.sp),
+        border: Border.all(
+          color: isSelected ? Colors.red : darkTextSecondary.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -417,7 +409,7 @@ Widget _buildFilterChip({
             size: 14.sp,
             color: isSelected 
               ? Colors.red
-              : const Color(0xFF2C2C2E).withOpacity(0.6),
+              : darkTextSecondary,
           ),
           SizedBox(width: 2.sp),
           Expanded(
@@ -427,7 +419,7 @@ Widget _buildFilterChip({
               style: GoogleFonts.inter(
                 color: isSelected 
                   ? Colors.red
-                  : const Color(0xFF2C2C2E).withOpacity(0.7),
+                  : darkTextSecondary,
                 fontSize: 11.sp,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
@@ -447,14 +439,14 @@ Widget _buildFilterChip({
           Icon(
             Icons.search_off,
             size: 48.sp,
-            color: const Color(0xFF2C2C2E).withOpacity(0.3),
+            color: darkTextSecondary,
           ),
           SizedBox(height: 16.sp),
           Text(
             '検索条件に一致する種目が見つかりません',
             style: GoogleFonts.inter(
               fontSize: 14.sp,
-              color: const Color(0xFF2C2C2E).withOpacity(0.6),
+              color: darkTextSecondary,
             ),
             textAlign: TextAlign.center,
           ),

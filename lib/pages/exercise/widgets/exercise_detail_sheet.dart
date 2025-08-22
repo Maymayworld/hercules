@@ -8,25 +8,20 @@ import 'package:google_fonts/google_fonts.dart';
 class ExerciseDetailSheet extends StatelessWidget {
   final Exercise exercise;
 
-  // ニューモーフィック用の色定義
-  static const Color neumorphicBackground = Color(0xFFE0E5EC);
-  static const Color neumorphicShadowDark = Color(0xFFA3B1C6);
-  static const Color neumorphicShadowLight = Color(0xFFFFFFFF);
+  // ダークテーマ用の色定義
+  static const Color darkBackground = Color(0xFF1C1C1C);
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
-  // ニューモーフィックスタイル用のBoxDecoration
-  BoxDecoration get neumorphicDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // ダークテーマ用のBoxDecoration
+  BoxDecoration get darkCardDecoration => BoxDecoration(
+    color: darkCardColor,
     borderRadius: BorderRadius.circular(12.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(4.sp, 4.sp),
-        blurRadius: 8.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-4.sp, -4.sp),
+        color: Colors.black.withOpacity(0.3),
+        offset: Offset(0, 2.sp),
         blurRadius: 8.sp,
         spreadRadius: 0,
       ),
@@ -66,7 +61,7 @@ class ExerciseDetailSheet extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: neumorphicBackground,
+        color: darkBackground,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20.sp),
           topRight: Radius.circular(20.sp),
@@ -81,7 +76,7 @@ class ExerciseDetailSheet extends StatelessWidget {
             width: 40.sp,
             height: 4.sp,
             decoration: BoxDecoration(
-              color: const Color(0xFF2C2C2E).withOpacity(0.3),
+              color: darkTextSecondary,
               borderRadius: BorderRadius.circular(2.sp),
             ),
           ),
@@ -147,18 +142,18 @@ class ExerciseDetailSheet extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: const Color(0xFF2C2C2E).withOpacity(0.1),
+            color: darkTextSecondary.withOpacity(0.3),
             width: 1,
           ),
         ),
       ),
       child: Row(
         children: [
-          // 左側：メイン部位のアイコン（ニューモーフィック）
+          // 左側：メイン部位のアイコン（ダークテーマ）
           Container(
             width: 40.sp,
             height: 40.sp,
-            decoration: neumorphicDecoration,
+            decoration: darkCardDecoration,
             child: Icon(
               _getExerciseIcon(),
               color: exercise.mainBodyPart.color,
@@ -178,7 +173,7 @@ class ExerciseDetailSheet extends StatelessWidget {
                   exercise.name,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2C2C2E),
+                    color: darkTextPrimary,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -199,7 +194,7 @@ class ExerciseDetailSheet extends StatelessWidget {
                             child: Text(
                               part,
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                                color: darkTextSecondary,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 11.sp,
                               ),
@@ -228,7 +223,7 @@ class ExerciseDetailSheet extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2C2C2E),
+              color: darkTextPrimary,
             ),
           ),
           SizedBox(height: 4.sp),
@@ -236,7 +231,7 @@ class ExerciseDetailSheet extends StatelessWidget {
             exercise.description,
             style: GoogleFonts.inter(
               fontSize: 14.sp,
-              color: const Color(0xFF2C2C2E).withOpacity(0.8),
+              color: darkTextSecondary,
               height: 1.4,
               fontWeight: FontWeight.w500, // 太さを追加
             ),
@@ -255,10 +250,10 @@ class ExerciseDetailSheet extends StatelessWidget {
         aspectRatio: 16 / 9,
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF2C2C2E).withOpacity(0.05),
+            color: darkCardColor,
             borderRadius: BorderRadius.circular(12.sp),
             border: Border.all(
-              color: const Color(0xFF2C2C2E).withOpacity(0.1),
+              color: darkTextSecondary.withOpacity(0.3),
               width: 1,
             ),
           ),
@@ -268,14 +263,14 @@ class ExerciseDetailSheet extends StatelessWidget {
               Icon(
                 Icons.play_circle_outline,
                 size: 48.sp,
-                color: const Color(0xFF2C2C2E).withOpacity(0.4),
+                color: darkTextSecondary,
               ),
               SizedBox(height: 8.sp),
               Text(
                 'トレーニング動画',
                 style: GoogleFonts.inter(
                   fontSize: 14.sp,
-                  color: const Color(0xFF2C2C2E).withOpacity(0.6),
+                  color: darkTextSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -283,7 +278,7 @@ class ExerciseDetailSheet extends StatelessWidget {
                 '（実装予定）',
                 style: GoogleFonts.inter(
                   fontSize: 10.sp,
-                  color: const Color(0xFF2C2C2E).withOpacity(0.4),
+                  color: darkTextSecondary.withOpacity(0.6),
                 ),
               ),
             ],
@@ -314,7 +309,7 @@ class ExerciseDetailSheet extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2C2C2E),
+              color: darkTextPrimary,
             ),
           ),
           SizedBox(height: 4.sp),
@@ -338,14 +333,14 @@ class ExerciseDetailSheet extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF2C2C2E).withOpacity(0.7), // スコアと同じ色に変更
+                          color: darkTextSecondary,
                         ),
                       ),
                       Text(
                         '$load/10',
                         style: GoogleFonts.inter(
                           fontSize: 12.sp,
-                          color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                          color: darkTextSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -353,21 +348,16 @@ class ExerciseDetailSheet extends StatelessWidget {
                   ),
                   SizedBox(height: 4.sp),
                   
-                  // プログレスバー（neumorphic）
+                  // プログレスバー（ダークテーマ）
                   Container(
                     height: 6.sp,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(3.sp),
+                      color: darkCardColor,
                       boxShadow: [
                         BoxShadow(
-                          color: neumorphicShadowDark,
-                          offset: Offset(1.sp, 1.sp),
-                          blurRadius: 2.sp,
-                          spreadRadius: 0,
-                        ),
-                        BoxShadow(
-                          color: neumorphicShadowLight,
-                          offset: Offset(-1.sp, -1.sp),
+                          color: Colors.black.withOpacity(0.5),
+                          offset: Offset(0, 1.sp),
                           blurRadius: 2.sp,
                           spreadRadius: 0,
                         ),
@@ -377,7 +367,7 @@ class ExerciseDetailSheet extends StatelessWidget {
                       borderRadius: BorderRadius.circular(3.sp),
                       child: LinearProgressIndicator(
                         value: load / 10.0,
-                        backgroundColor: neumorphicBackground,
+                        backgroundColor: darkCardColor,
                         valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
                       ),
                     ),
@@ -405,7 +395,7 @@ class ExerciseDetailSheet extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2C2C2E),
+              color: darkTextPrimary,
             ),
           ),
           SizedBox(height: 4.sp),
@@ -413,7 +403,7 @@ class ExerciseDetailSheet extends StatelessWidget {
             methodText,
             style: GoogleFonts.inter(
               fontSize: 14.sp,
-              color: const Color(0xFF2C2C2E).withOpacity(0.8),
+              color: darkTextSecondary,
               height: 1.6,
               fontWeight: FontWeight.w500, // 太さを追加
             ),
@@ -438,7 +428,7 @@ class ExerciseDetailSheet extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2C2C2E),
+              color: darkTextPrimary,
             ),
           ),
           SizedBox(height: 4.sp),
@@ -446,7 +436,7 @@ class ExerciseDetailSheet extends StatelessWidget {
             pointsText,
             style: GoogleFonts.inter(
               fontSize: 14.sp,
-              color: const Color(0xFF2C2C2E).withOpacity(0.8),
+              color: darkTextSecondary,
               height: 1.6,
               fontWeight: FontWeight.w500, // 太さを追加
             ),
@@ -497,8 +487,8 @@ class ExerciseDetailSheet extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () => Navigator.of(context).pop(),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFCED3D9),
-          foregroundColor: const Color(0xFF2C2C2E),
+          backgroundColor: darkTextSecondary,
+          foregroundColor: darkBackground,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.sp),

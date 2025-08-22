@@ -14,45 +14,38 @@ import 'package:google_fonts/google_fonts.dart';
 class ExerciseRecordSheet extends HookConsumerWidget {
   final Exercise exercise;
 
-  // ニューモーフィック用の色定義
-  static const Color neumorphicBackground = Color(0xFFE0E5EC);
-  static const Color neumorphicShadowDark = Color(0xFFA3B1C6);
-  static const Color neumorphicShadowLight = Color(0xFFFFFFFF);
+  // ダークテーマ用の色定義
+  static const Color darkBackground = Color(0xFF1C1C1C);
+  static const Color darkCardColor = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
-  // ニューモーフィックスタイル用のBoxDecoration
-  BoxDecoration get neumorphicDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // ダークテーマ用のBoxDecoration
+  BoxDecoration get darkCardDecoration => BoxDecoration(
+    color: darkCardColor,
     borderRadius: BorderRadius.circular(12.sp),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(4.sp, 4.sp),
-        blurRadius: 8.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(-4.sp, -4.sp),
+        color: Colors.black.withOpacity(0.3),
+        offset: Offset(0, 2.sp),
         blurRadius: 8.sp,
         spreadRadius: 0,
       ),
     ],
   );
 
-  // 押し込まれたニューモーフィックスタイル
-  BoxDecoration get neumorphicInsetDecoration => BoxDecoration(
-    color: neumorphicBackground,
+  // 押し込まれたダークテーマスタイル
+  BoxDecoration get darkCardInsetDecoration => BoxDecoration(
+    color: darkBackground,
     borderRadius: BorderRadius.circular(12.sp),
+    border: Border.all(
+      color: darkTextSecondary.withOpacity(0.3),
+      width: 1,
+    ),
     boxShadow: [
       BoxShadow(
-        color: neumorphicShadowLight,
-        offset: Offset(2.sp, 2.sp),
-        blurRadius: 4.sp,
-        spreadRadius: 0,
-      ),
-      BoxShadow(
-        color: neumorphicShadowDark,
-        offset: Offset(-2.sp, -2.sp),
+        color: Colors.black.withOpacity(0.5),
+        offset: Offset(0, 1.sp),
         blurRadius: 4.sp,
         spreadRadius: 0,
       ),
@@ -149,7 +142,7 @@ class ExerciseRecordSheet extends HookConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: neumorphicBackground,
+        color: darkBackground,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20.sp),
           topRight: Radius.circular(20.sp),
@@ -164,7 +157,7 @@ class ExerciseRecordSheet extends HookConsumerWidget {
             width: 40.sp,
             height: 4.sp,
             decoration: BoxDecoration(
-              color: const Color(0xFF2C2C2E).withOpacity(0.3),
+              color: darkTextSecondary,
               borderRadius: BorderRadius.circular(2.sp),
             ),
           ),
@@ -209,18 +202,18 @@ class ExerciseRecordSheet extends HookConsumerWidget {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: const Color(0xFF2C2C2E).withOpacity(0.1),
+            color: darkTextSecondary.withOpacity(0.3),
             width: 1,
           ),
         ),
       ),
       child: Row(
         children: [
-          // 左側：メイン部位のアイコン（ニューモーフィック）
+          // 左側：メイン部位のアイコン（ダークテーマ）
           Container(
             width: 40.sp,
             height: 40.sp,
-            decoration: neumorphicDecoration,
+            decoration: darkCardDecoration,
             child: Icon(
               _getExerciseIcon(),
               color: exercise.mainBodyPart.color,
@@ -240,7 +233,7 @@ class ExerciseRecordSheet extends HookConsumerWidget {
                   exercise.name,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2C2C2E),
+                    color: darkTextPrimary,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -255,7 +248,7 @@ class ExerciseRecordSheet extends HookConsumerWidget {
                       child: Text(
                         exercise.detailedTargetParts.take(3).join(' '),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                          color: darkTextSecondary,
                           fontWeight: FontWeight.w500,
                           fontSize: 11.sp,
                         ),
@@ -277,7 +270,7 @@ class ExerciseRecordSheet extends HookConsumerWidget {
             child: Container(
               width: 32.sp,
               height: 32.sp,
-              decoration: neumorphicDecoration.copyWith(
+              decoration: darkCardDecoration.copyWith(
                 borderRadius: BorderRadius.circular(16.sp),
               ),
               child: Icon(
@@ -310,24 +303,24 @@ class ExerciseRecordSheet extends HookConsumerWidget {
               child: Container(
                 width: 50.sp,
                 height: 50.sp,
-                decoration: neumorphicDecoration.copyWith(
+                decoration: darkCardDecoration.copyWith(
                   borderRadius: BorderRadius.circular(12.sp),
                 ),
                 child: Icon(
                   Icons.remove,
                   size: 24.sp,
-                  color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                  color: darkTextSecondary,
                 ),
               ),
             ),
             
             SizedBox(width: 20.sp),
             
-            // 回数入力欄（neumorphic）
+            // 回数入力欄（ダークテーマ）
             Container(
               width: 100.sp,
               height: 60.sp,
-              decoration: neumorphicInsetDecoration,
+              decoration: darkCardInsetDecoration,
               child: Center(
                 child: TextField(
                   controller: controller,
@@ -335,7 +328,7 @@ class ExerciseRecordSheet extends HookConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 32.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF2C2C2E).withOpacity(0.85),
+                    color: darkTextPrimary,
                   ),
                   keyboardType: TextInputType.number,
                   inputFormatters: [
@@ -365,7 +358,7 @@ class ExerciseRecordSheet extends HookConsumerWidget {
               child: Container(
                 width: 50.sp,
                 height: 50.sp,
-                decoration: neumorphicDecoration.copyWith(
+                decoration: darkCardDecoration.copyWith(
                   borderRadius: BorderRadius.circular(12.sp),
                 ),
                 child: Icon(
@@ -391,7 +384,7 @@ class ExerciseRecordSheet extends HookConsumerWidget {
     
     return Column(
       children: [
-        // 時間表示（neumorphic）
+        // 時間表示（ダークテーマ）
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -405,13 +398,13 @@ class ExerciseRecordSheet extends HookConsumerWidget {
               child: Container(
                 width: 50.sp,
                 height: 50.sp,
-                decoration: neumorphicDecoration.copyWith(
+                decoration: darkCardDecoration.copyWith(
                   borderRadius: BorderRadius.circular(12.sp),
                 ),
                 child: Icon(
                   Icons.refresh,
                   size: 24.sp,
-                  color: const Color(0xFF2C2C2E).withOpacity(0.7),
+                  color: darkTextSecondary,
                 ),
               ),
             ),
@@ -423,13 +416,13 @@ class ExerciseRecordSheet extends HookConsumerWidget {
                 horizontal: 24.sp,
                 vertical: 16.sp,
               ),
-              decoration: neumorphicInsetDecoration,
+              decoration: darkCardInsetDecoration,
               child: Text(
                 '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
                 style: GoogleFonts.inter(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF2C2C2E).withOpacity(0.85),
+                  color: darkTextPrimary,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
@@ -445,7 +438,7 @@ class ExerciseRecordSheet extends HookConsumerWidget {
               child: Container(
                 width: 50.sp,
                 height: 50.sp,
-                decoration: neumorphicDecoration.copyWith(
+                decoration: darkCardDecoration.copyWith(
                   borderRadius: BorderRadius.circular(12.sp),
                 ),
                 child: Icon(
@@ -495,8 +488,8 @@ class ExerciseRecordSheet extends HookConsumerWidget {
             child: ElevatedButton(
               onPressed: () => Navigator.of(context).pop(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFCED3D9),
-                foregroundColor: const Color(0xFF2C2C2E),
+                backgroundColor: darkTextSecondary,
+                foregroundColor: darkBackground,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.sp),
