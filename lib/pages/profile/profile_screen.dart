@@ -340,7 +340,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
         // メインコンテンツ
         Column(
           children: [
-            SizedBox(height: 32.sp),
+            SizedBox(height: 24.sp),
             // プロフィール上部（修正版 - 縦並び）
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20.sp),
@@ -400,7 +400,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with TickerProvid
                     ),
                   ),
                   
-                  SizedBox(height: 12.sp),
+                  SizedBox(height: 8.sp),
                   
                   // ユーザー名（プロフィール画像の下）- 中央配置
                   _isLoadingUsername
